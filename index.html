@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Audiometría Tonal</title>
+    <title>Formulario Audiometría</title>
     <style>
         :root {
             --primary: #0f766e;
@@ -74,7 +74,6 @@
             padding-bottom: 8px;
         }
 
-        /* Grid para datos demográficos/técnicos */
         .config-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -84,9 +83,6 @@
         @media (min-width: 768px) {
             .config-grid {
                 grid-template-columns: repeat(3, 1fr);
-            }
-            .grid-span-2 {
-                grid-column: span 2;
             }
         }
 
@@ -123,10 +119,8 @@
             background-color: #f1f5f9;
             color: #475569;
             font-weight: 500;
-            cursor: not-allowed;
         }
 
-        /* Contenedores para hacer las tablas responsive en móviles */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -138,7 +132,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px; /* Asegura que no se aplasten las columnas */
+            min-width: 800px;
         }
 
         th, td {
@@ -148,37 +142,11 @@
             border-right: 1px solid var(--border);
         }
         
-        th:last-child, td:last-child {
-            border-right: none;
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: var(--text-secondary);
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .ear-header-od {
-            background-color: #fee2e2;
-            color: var(--right-ear);
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        .ear-header-oi {
-            background-color: #dbeafe;
-            color: var(--left-ear);
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        .row-label {
-            font-weight: 600;
-            font-size: 13px;
-            background-color: #f8fafc;
-            width: 120px;
-        }
+        th:last-child, td:last-child { border-right: none; }
+        th { background-color: #f8fafc; color: var(--text-secondary); font-size: 13px; font-weight: 700; }
+        .ear-header-od { background-color: #fee2e2; color: var(--right-ear); font-size: 15px; font-weight: bold; }
+        .ear-header-oi { background-color: #dbeafe; color: var(--left-ear); font-size: 15px; font-weight: bold; }
+        .row-label { font-weight: 600; font-size: 13px; background-color: #f8fafc; width: 120px; }
 
         .input-db {
             width: 100%;
@@ -187,12 +155,6 @@
             border-radius: 4px;
             text-align: center;
             font-size: 14px;
-        }
-
-        .input-db:focus {
-            outline: none;
-            border-color: var(--primary);
-            background-color: #f0fdfa;
         }
 
         .btn-submit {
@@ -208,33 +170,44 @@
             transition: background-color 0.2s;
         }
 
-        .btn-submit:hover {
-            background-color: var(--primary-hover);
-        }
+        .btn-submit:hover { background-color: var(--primary-hover); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>LOGOAUDIOMETRÍA: Audiometría Verbal - Ajuste a Curva PHI</h1>
+        <h1>Formulario Audiometría</h1>
         <p>Módulo de Captación de Datos Clínicos y Umbrales Tonales</p>
     </header>
 
     <form id="audiometriaForm" onsubmit="enviarDatos(event)">
         
-        <!-- Bloque 1: Configuración de la Evaluación -->
+        <div class="card">
+            <h2>Datos del Paciente</h2>
+            <div class="config-grid">
+                <div class="form-group">
+                    <label for="npField">NP (Nº Paciente)</label>
+                    <input type="text" id="npField" class="form-control" placeholder="Cargando NP..." readonly>
+                </div>
+                <div class="form-group">
+                    <label for="nombreField">Nombre</label>
+                    <input type="text" id="nombreField" class="form-control" placeholder="Buscando nombre..." readonly>
+                </div>
+                <div class="form-group">
+                    <label for="apellidoField">Apellidos</label>
+                    <input type="text" id="apellidoField" class="form-control" placeholder="Buscando apellidos..." readonly>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <h2>Datos de la Exploración</h2>
             <div class="config-grid">
-                
-                <!-- Fecha (Automática) -->
                 <div class="form-group">
                     <label for="fecha">Fecha</label>
                     <input type="date" id="fecha" class="form-control" required>
                 </div>
-
-                <!-- Técnico -->
                 <div class="form-group">
                     <label for="tecnico">Técnico / Evaluador</label>
                     <select id="tecnico" class="form-control" required>
@@ -245,8 +218,6 @@
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
-
-                <!-- Cabina -->
                 <div class="form-group">
                     <label for="cabina">Cabina de Exploración</label>
                     <select id="cabina" class="form-control" onchange="actualizarAudiometro(this.value)" required>
@@ -258,14 +229,10 @@
                         <option value="05 Desconocido">05 Desconocido</option>
                     </select>
                 </div>
-
-                <!-- Audiómetro (Auto-rellenable condicional) -->
                 <div class="form-group">
                     <label for="audiometro">Audiómetro</label>
                     <input type="text" id="audiometro" class="form-control" placeholder="Automático según cabina" readonly>
                 </div>
-
-                <!-- Auricular / Transductor -->
                 <div class="form-group">
                     <label for="auricular">Auricular / Transductor</label>
                     <select id="auricular" class="form-control" required>
@@ -277,11 +244,9 @@
                         <option value="Desconocido">Desconocido</option>
                     </select>
                 </div>
-
             </div>
         </div>
 
-        <!-- Bloque 2: Umbrales Tonales Oído Derecho -->
         <div class="card">
             <h2>Umbrales Tonales - Oído Derecho (OD)</h2>
             <div class="table-responsive">
@@ -336,7 +301,6 @@
             </div>
         </div>
 
-        <!-- Bloque 3: Umbrales Tonales Oído Izquierdo -->
         <div class="card">
             <h2>Umbrales Tonales - Oído Izquierdo (OI)</h2>
             <div class="table-responsive">
@@ -396,60 +360,40 @@
 </div>
 
 <script>
-    // Al cargar la página, se calcula y rellena automáticamente la fecha de HOY
     window.onload = function() {
+        // 1. Asignar fecha de hoy
         const hoy = new Date();
         const yyyy = hoy.getFullYear();
-        let mm = hoy.getMonth() + 1; // Enero es 0
+        let mm = hoy.getMonth() + 1;
         let dd = hoy.getDate();
-
         if (dd < 10) dd = '0' + dd;
         if (mm < 10) mm = '0' + mm;
+        document.getElementById('fecha').value = yyyy + '-' + mm + '-' + dd;
 
-        const fechaFormateada = yyyy + '-' + mm + '-' + dd;
-        document.getElementById('fecha').value = fechaFormateada;
+        // 2. Simulación de carga de datos (Explicación abajo)
+        cargarDatosPacienteSimulados();
     };
 
-    // Lógica para asignar automáticamente el Audiómetro según la Cabina elegida
     function actualizarAudiometro(valorCabina) {
         const inputAudiometro = document.getElementById('audiometro');
-        
-        if (valorCabina === "01 Audio ORL") {
-            inputAudiometro.value = "Affinity Compact V3";
-        } else if (valorCabina === "02 Audio Campo Libre") {
-            inputAudiometro.value = "AD629";
-        } else if (valorCabina === "03 Audioprótesis") {
-            inputAudiometro.value = "Affinity";
-        } else if (valorCabina === "04 On-Line") {
-            inputAudiometro.value = "AUDIOGRAMDIRECT";
-        } else {
-            inputAudiometro.value = "Desconocido";
-        }
+        if (valorCabina === "01 Audio ORL") inputAudiometro.value = "Affinity Compact V3";
+        else if (valorCabina === "02 Audio Campo Libre") inputAudiometro.value = "AD629";
+        else if (valorCabina === "03 Audioprótesis") inputAudiometro.value = "Affinity";
+        else if (valorCabina === "04 On-Line") inputAudiometro.value = "AUDIOGRAMDIRECT";
+        else inputAudiometro.value = "Desconocido";
     }
 
-    // Función de control para procesar el envío de datos
+    function cargarDatosPacienteSimulados() {
+        // Marcadores de posición visuales reflejando los requerimientos
+        document.getElementById('npField').value = "1024 (Ejemplo INTRO!H4)";
+        document.getElementById('nombreField').value = "Juan (Buscado en Col D)";
+        document.getElementById('apellidoField').value = "Pérez (Buscado en Col E)";
+    }
+
     function enviarDatos(event) {
         event.preventDefault();
-        
-        // Ejemplo para capturar los datos y verificar que funciona de manera nativa
-        const formData = new FormData(document.getElementById('audiometriaForm'));
-        const datos = {
-            fecha: document.getElementById('fecha').value,
-            tecnico: document.getElementById('tecnico').value,
-            cabina: document.getElementById('cabina').value,
-            audiometro: document.getElementById('audiometro').value,
-            auricular: document.getElementById('auricular').value,
-            umbrales: {}
-        };
-
-        formData.forEach((value, key) => {
-            if(value !== "") datos.umbrales[key] = parseFloat(value);
-        });
-
-        console.log("Datos listos para enviar/procesar:", datos);
-        alert("¡Registro de audiometría procesado con éxito! Revisa la consola del navegador para ver el objeto JSON generado.");
+        alert("Audiometría procesada correctamente.");
     }
 </script>
-
 </body>
 </html>
