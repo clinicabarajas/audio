@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Audiometría Tonal</title>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-hover: #115e59;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --right-ear: #dc2626;
+            --left-ear: #2563eb;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border-left: 6px solid var(--primary);
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        /* Grid para datos demográficos/técnicos */
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .config-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .grid-span-2 {
+                grid-column: span 2;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+            color: var(--text);
+            background-color: #fff;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-control:disabled {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 500;
+            cursor: not-allowed;
+        }
+
+        /* Contenedores para hacer las tablas responsive en móviles */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px; /* Asegura que no se aplasten las columnas */
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+        }
+        
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .ear-header-od {
+            background-color: #fee2e2;
+            color: var(--right-ear);
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .ear-header-oi {
+            background-color: #dbeafe;
+            color: var(--left-ear);
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .row-label {
+            font-weight: 600;
+            font-size: 13px;
+            background-color: #f8fafc;
+            width: 120px;
+        }
+
+        .input-db {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .input-db:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #f0fdfa;
+        }
+
+        .btn-submit {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>LOGOAUDIOMETRÍA: Audiometría Verbal - Ajuste a Curva PHI</h1>
+        <p>Módulo de Captación de Datos Clínicos y Umbrales Tonales</p>
+    </header>
+
+    <form id="audiometriaForm" onsubmit="enviarDatos(event)">
+        
+        <!-- Bloque 1: Configuración de la Evaluación -->
+        <div class="card">
+            <h2>Datos de la Exploración</h2>
+            <div class="config-grid">
+                
+                <!-- Fecha (Automática) -->
+                <div class="form-group">
+                    <label for="fecha">Fecha</label>
+                    <input type="date" id="fecha" class="form-control" required>
+                </div>
+
+                <!-- Técnico -->
+                <div class="form-group">
+                    <label for="tecnico">Técnico / Evaluador</label>
+                    <select id="tecnico" class="form-control" required>
+                        <option value="" disabled selected>Seleccione técnico...</option>
+                        <option value="Natalia Rodriguez">Natalia Rodríguez</option>
+                        <option value="Franz Zenker">Franz Zenker</option>
+                        <option value="Romina Martin">Romina Martín</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+
+                <!-- Cabina -->
+                <div class="form-group">
+                    <label for="cabina">Cabina de Exploración</label>
+                    <select id="cabina" class="form-control" onchange="actualizarAudiometro(this.value)" required>
+                        <option value="" disabled selected>Seleccione cabina...</option>
+                        <option value="01 Audio ORL">01 Audio ORL</option>
+                        <option value="02 Audio Campo Libre">02 Audio Campo Libre</option>
+                        <option value="03 Audioprótesis">03 Audioprótesis</option>
+                        <option value="04 On-Line">04 On-Line</option>
+                        <option value="05 Desconocido">05 Desconocido</option>
+                    </select>
+                </div>
+
+                <!-- Audiómetro (Auto-rellenable condicional) -->
+                <div class="form-group">
+                    <label for="audiometro">Audiómetro</label>
+                    <input type="text" id="audiometro" class="form-control" placeholder="Automático según cabina" readonly>
+                </div>
+
+                <!-- Auricular / Transductor -->
+                <div class="form-group">
+                    <label for="auricular">Auricular / Transductor</label>
+                    <select id="auricular" class="form-control" required>
+                        <option value="" disabled selected>Seleccione transductor...</option>
+                        <option value="TDH-39">TDH-39</option>
+                        <option value="ER3A">ER3A</option>
+                        <option value="IP30">IP30</option>
+                        <option value="Audífonos">Audífonos</option>
+                        <option value="Desconocido">Desconocido</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Bloque 2: Umbrales Tonales Oído Derecho -->
+        <div class="card">
+            <h2>Umbrales Tonales - Oído Derecho (OD)</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="ear-header-od">OD</th>
+                            <th colspan="10">Frecuencias Clínicas (Hz)</th>
+                        </tr>
+                        <tr>
+                            <th>250</th>
+                            <th>500</th>
+                            <th>750</th>
+                            <th>1000</th>
+                            <th>1500</th>
+                            <th>2000</th>
+                            <th>3000</th>
+                            <th>4000</th>
+                            <th>6000</th>
+                            <th>8000</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="row-label">Vía Aérea (VA)</td>
+                            <td><input type="number" class="input-db" name="od_va_250" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_va_500" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_va_750" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_va_1000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_va_1500" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_va_2000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_va_3000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_va_4000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_va_6000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_va_8000" min="-10" max="120" step="5"></td>
+                        </tr>
+                        <tr>
+                            <td class="row-label">Vía Ósea (VO)</td>
+                            <td><input type="number" class="input-db" name="od_vo_250" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_vo_500" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_vo_750" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_vo_1000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_vo_1500" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_vo_2000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_vo_3000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_vo_4000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_vo_6000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="od_vo_8000" min="-10" max="80" step="5"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bloque 3: Umbrales Tonales Oído Izquierdo -->
+        <div class="card">
+            <h2>Umbrales Tonales - Oído Izquierdo (OI)</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="ear-header-oi">OI</th>
+                            <th colspan="10">Frecuencias Clínicas (Hz)</th>
+                        </tr>
+                        <tr>
+                            <th>250</th>
+                            <th>500</th>
+                            <th>750</th>
+                            <th>1000</th>
+                            <th>1500</th>
+                            <th>2000</th>
+                            <th>3000</th>
+                            <th>4000</th>
+                            <th>6000</th>
+                            <th>8000</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="row-label">Vía Aérea (VA)</td>
+                            <td><input type="number" class="input-db" name="oi_va_250" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_va_500" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_va_750" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_va_1000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_va_1500" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_va_2000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_va_3000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_va_4000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_va_6000" min="-10" max="120" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_va_8000" min="-10" max="120" step="5"></td>
+                        </tr>
+                        <tr>
+                            <td class="row-label">Vía Ósea (VO)</td>
+                            <td><input type="number" class="input-db" name="oi_vo_250" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_vo_500" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_vo_750" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_vo_1000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_vo_1500" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_vo_2000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_vo_3000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_vo_4000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_vo_6000" min="-10" max="80" step="5"></td>
+                            <td><input type="number" class="input-db" name="oi_vo_8000" min="-10" max="80" step="5"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Guardar Registro de Audiometría</button>
+    </form>
+</div>
+
+<script>
+    // Al cargar la página, se calcula y rellena automáticamente la fecha de HOY
+    window.onload = function() {
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        let mm = hoy.getMonth() + 1; // Enero es 0
+        let dd = hoy.getDate();
+
+        if (dd < 10) dd = '0' + dd;
+        if (mm < 10) mm = '0' + mm;
+
+        const fechaFormateada = yyyy + '-' + mm + '-' + dd;
+        document.getElementById('fecha').value = fechaFormateada;
+    };
+
+    // Lógica para asignar automáticamente el Audiómetro según la Cabina elegida
+    function actualizarAudiometro(valorCabina) {
+        const inputAudiometro = document.getElementById('audiometro');
+        
+        if (valorCabina === "01 Audio ORL") {
+            inputAudiometro.value = "Affinity Compact V3";
+        } else if (valorCabina === "02 Audio Campo Libre") {
+            inputAudiometro.value = "AD629";
+        } else if (valorCabina === "03 Audioprótesis") {
+            inputAudiometro.value = "Affinity";
+        } else if (valorCabina === "04 On-Line") {
+            inputAudiometro.value = "AUDIOGRAMDIRECT";
+        } else {
+            inputAudiometro.value = "Desconocido";
+        }
+    }
+
+    // Función de control para procesar el envío de datos
+    function enviarDatos(event) {
+        event.preventDefault();
+        
+        // Ejemplo para capturar los datos y verificar que funciona de manera nativa
+        const formData = new FormData(document.getElementById('audiometriaForm'));
+        const datos = {
+            fecha: document.getElementById('fecha').value,
+            tecnico: document.getElementById('tecnico').value,
+            cabina: document.getElementById('cabina').value,
+            audiometro: document.getElementById('audiometro').value,
+            auricular: document.getElementById('auricular').value,
+            umbrales: {}
+        };
+
+        formData.forEach((value, key) => {
+            if(value !== "") datos.umbrales[key] = parseFloat(value);
+        });
+
+        console.log("Datos listos para enviar/procesar:", datos);
+        alert("¡Registro de audiometría procesado con éxito! Revisa la consola del navegador para ver el objeto JSON generado.");
+    }
+</script>
+
+</body>
+</html>
